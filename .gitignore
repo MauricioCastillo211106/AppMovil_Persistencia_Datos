@@ -1,0 +1,31 @@
+# Entornos virtuales
+venv/
+env/
+.venv/
+
+# Archivos de configuración
+*.env
+
+# Archivos compilados de Python
+*.pyc
+__pycache__/
+
+# Configuración del entorno de desarrollo
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Archivos de bases de datos locales
+*.db
+
+# Archivos de registro
+*.log
+
+# Archivos de dependencia
+*.egg-info/
+.eggs/
+
+# Archivos de desarrollo
+.DS_Store
+*.swp
