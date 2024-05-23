@@ -29,3 +29,4 @@ __pycache__/
 # Archivos de desarrollo
 .DS_Store
 *.swp
+.env
