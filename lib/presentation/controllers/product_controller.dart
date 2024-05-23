@@ -11,6 +11,7 @@ class ProductController extends GetxController {
 
   var products = <Product>[].obs;
   var isLoading = true.obs;
+  var errorMessage = ''.obs;
 
   ProductController({required this.productRepository});
 
@@ -28,9 +29,11 @@ class ProductController extends GetxController {
   void fetchProducts() async {
     try {
       isLoading(true);
+      errorMessage('');
       final result = await productRepository.getProducts();
       products.assignAll(result);
     } catch (e) {
+      errorMessage('Error fetching products: $e');
       print('Error fetching products: $e');
     } finally {
       isLoading(false);
@@ -40,9 +43,11 @@ class ProductController extends GetxController {
   void deleteProduct(int id) async {
     try {
       isLoading(true);
+      errorMessage('');
       await productRepository.deleteProduct(id);
       fetchProducts();
     } catch (e) {
+      errorMessage('Error deleting product: $e');
       print('Error deleting product: $e');
     } finally {
       isLoading(false);
@@ -52,9 +57,11 @@ class ProductController extends GetxController {
   void createProduct(String name, double price, int stock) async {
     try {
       isLoading(true);
+      errorMessage('');
       await productRepository.createProduct(Product(id: 0, name: name, price: price, stock: stock));
       fetchProducts();
     } catch (e) {
+      errorMessage('Error creating product: $e');
       print('Error creating product: $e');
     } finally {
       isLoading(false);
@@ -64,9 +71,11 @@ class ProductController extends GetxController {
   void updateProduct(int id, String name, double price, int stock) async {
     try {
       isLoading(true);
+      errorMessage('');
       await productRepository.updateProduct(Product(id: id, name: name, price: price, stock: stock));
       fetchProducts();
     } catch (e) {
+      errorMessage('Error updating product: $e');
       print('Error updating product: $e');
     } finally {
       isLoading(false);
@@ -74,11 +83,17 @@ class ProductController extends GetxController {
   }
 
   void syncLocalData() async {
-    final localProducts = await localDatabase.getProducts();
-    for (var product in localProducts) {
-      await productRepository.createProduct(Product.fromJson(product));
-      await localDatabase.deleteProduct(product['id']);
+    try {
+      errorMessage('');
+      final unsyncedProducts = await localDatabase.getUnsyncedProducts();
+      for (var product in unsyncedProducts) {
+        await productRepository.createProduct(Product.fromJson(product));
+        await localDatabase.markAsSynced(product['id']);
+      }
+      fetchProducts();
+    } catch (e) {
+      errorMessage('Error syncing data: $e');
+      print('Error syncing data: $e');
     }
-    fetchProducts();
   }
 }

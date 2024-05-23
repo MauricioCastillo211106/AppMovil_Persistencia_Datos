@@ -18,12 +18,25 @@ class LocalDatabase {
     String path = join(await getDatabasesPath(), 'app_database.db');
     return await openDatabase(
       path,
-      onCreate: (db, version) {
-        return db.execute(
-          "CREATE TABLE products(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, price REAL, stock INTEGER)",
+      version: 2, // Aumentar la versión de la base de datos
+      onCreate: (db, version) async {
+        await db.execute(
+          '''
+          CREATE TABLE products(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            price REAL,
+            stock INTEGER,
+            isSynced INTEGER DEFAULT 0
+          )
+          ''',
         );
       },
-      version: 1,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('ALTER TABLE products ADD COLUMN isSynced INTEGER DEFAULT 0');
+        }
+      },
     );
   }
 
@@ -54,5 +67,25 @@ class LocalDatabase {
       where: 'id = ?',
       whereArgs: [id],
     );
+  }
+
+  Future<void> markAsSynced(int id) async {
+    final db = await database;
+    await db.update(
+      'products',
+      {'isSynced': 1},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getUnsyncedProducts() async {
+    final db = await database;
+    return await db.query('products', where: 'isSynced = 0');
+  }
+
+  Future<void> clearProducts() async {
+    final db = await database;
+    await db.delete('products');
   }
 }
