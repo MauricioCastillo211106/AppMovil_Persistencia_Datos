@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistencia_de_datos/presentation/controllers/product_controller.dart';
 
-class CreateProductView extends StatelessWidget {
+class CreateProductScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _priceController = TextEditingController();

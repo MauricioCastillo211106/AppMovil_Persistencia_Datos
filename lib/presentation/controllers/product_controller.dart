@@ -1,16 +1,14 @@
 import 'package:get/get.dart';
-import 'package:persistencia_de_datos/data/models/product_model.dart';
-import 'package:persistencia_de_datos/domain/usecases/fetch_products_usecase.dart';
-import 'package:persistencia_de_datos/data/repositories/product_repository.dart';
+import 'package:persistencia_de_datos/domain/models/models.dart';
+import 'package:persistencia_de_datos/domain/repositories/repositories.dart';
 
 class ProductController extends GetxController {
-  final FetchProductsUseCase fetchProductsUseCase;
+  final ProductRepository productRepository;
 
   var products = <Product>[].obs;
   var isLoading = true.obs;
 
-  ProductController({required ProductRepository productRepository})
-      : fetchProductsUseCase = FetchProductsUseCase(repository: productRepository);
+  ProductController({required this.productRepository});
 
   @override
   void onInit() {
@@ -20,8 +18,10 @@ class ProductController extends GetxController {
 
   void fetchProducts() async {
     try {
+      print('Fetching products...');
       isLoading(true);
-      final result = await fetchProductsUseCase();
+      final result = await productRepository.getProducts();
+      print('Products fetched: $result');
       products.assignAll(result);
     } catch (e) {
       print('Error fetching products: $e');
@@ -33,7 +33,7 @@ class ProductController extends GetxController {
   void deleteProduct(int id) async {
     try {
       isLoading(true);
-      await fetchProductsUseCase.repository.deleteProduct(id);
+      await productRepository.deleteProduct(id);
       fetchProducts();
     } catch (e) {
       print('Error deleting product: $e');
@@ -45,7 +45,7 @@ class ProductController extends GetxController {
   void createProduct(String name, double price, int stock) async {
     try {
       isLoading(true);
-      await fetchProductsUseCase.repository.createProduct(name, price, stock);
+      await productRepository.createProduct(Product(id: 0, name: name, price: price, stock: stock));
       fetchProducts();
     } catch (e) {
       print('Error creating product: $e');

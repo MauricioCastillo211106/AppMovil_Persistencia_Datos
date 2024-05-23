@@ -1,8 +1,9 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:persistencia_de_datos/core/utils/constants.dart';
+import 'package:persistencia_de_datos/domain/models/models.dart';
 
-class ApiProvider {
+class ApiClient {
   Future<List<dynamic>> fetchProducts() async {
     final response = await http.get(Uri.parse('${Constants.baseUrl}/products'));
 
@@ -21,15 +22,11 @@ class ApiProvider {
     }
   }
 
-  Future<void> createProduct(String name, double price, int stock) async {
+  Future<void> createProduct(Product product) async {
     final response = await http.post(
       Uri.parse('${Constants.baseUrl}/products'),
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'name': name,
-        'price': price,
-        'stock': stock,
-      }),
+      body: json.encode(product.toJson()),
     );
 
     if (response.statusCode != 201) {
