@@ -1,2 +1,5 @@
 Flask
 flask_cors
+Flask-SQLAlchemy
+psycopg2-binary
+Flask-CORS
