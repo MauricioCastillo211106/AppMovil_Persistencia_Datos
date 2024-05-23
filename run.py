@@ -5,7 +5,7 @@ from app.routes import register_routes
 
 app = create_app()
 
-CORS(app)  # Habilitar CORS para toda la aplicación
+CORS(app, resources={r"/*": {"origins": "*"}})  # Habilitar CORS para toda la aplicación
 
 with app.app_context():
     db.create_all()  # Crea las tablas si no existen
