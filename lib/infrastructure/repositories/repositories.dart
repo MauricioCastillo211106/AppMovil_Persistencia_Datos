@@ -22,4 +22,9 @@ class ProductRepositoryImpl implements ProductRepository {
   Future<void> deleteProduct(int id) async {
     await apiClient.deleteProduct(id);
   }
+
+  @override
+  Future<void> updateProduct(Product product) async {
+    await apiClient.updateProduct(product);
+  }
 }

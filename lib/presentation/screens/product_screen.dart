@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistencia_de_datos/presentation/controllers/product_controller.dart';
 import 'package:persistencia_de_datos/presentation/screens/create_product_screen.dart';
+import 'package:persistencia_de_datos/presentation/screens/edit_product_screen.dart';
 import 'package:persistencia_de_datos/presentation/widgets/product_card.dart';
 
 class ProductScreen extends StatelessWidget {
@@ -36,7 +37,15 @@ class ProductScreen extends StatelessWidget {
             itemCount: controller.products.length,
             itemBuilder: (context, index) {
               final product = controller.products[index];
-              return ProductCard(product: product, onDelete: () => controller.deleteProduct(product.id));
+              return GestureDetector(
+                onTap: () {
+                  Get.to(() => EditProductScreen(productId: product.id));
+                },
+                child: ProductCard(
+                  product: product,
+                  onDelete: () => controller.deleteProduct(product.id),
+                ),
+              );
             },
           );
         }

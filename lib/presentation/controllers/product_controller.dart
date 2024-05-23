@@ -1,9 +1,13 @@
 import 'package:get/get.dart';
 import 'package:persistencia_de_datos/domain/models/models.dart';
 import 'package:persistencia_de_datos/domain/repositories/repositories.dart';
+import 'package:persistencia_de_datos/infrastructure/datasources/local/local_database.dart';
+import 'package:persistencia_de_datos/services/network_service.dart';
 
 class ProductController extends GetxController {
   final ProductRepository productRepository;
+  final LocalDatabase localDatabase = LocalDatabase();
+  final NetworkService networkService = Get.find<NetworkService>();
 
   var products = <Product>[].obs;
   var isLoading = true.obs;
@@ -12,16 +16,19 @@ class ProductController extends GetxController {
 
   @override
   void onInit() {
-    fetchProducts();
     super.onInit();
+    fetchProducts();
+    networkService.isConnected.listen((isConnected) {
+      if (isConnected) {
+        syncLocalData();
+      }
+    });
   }
 
   void fetchProducts() async {
     try {
-      print('Fetching products...');
       isLoading(true);
       final result = await productRepository.getProducts();
-      print('Products fetched: $result');
       products.assignAll(result);
     } catch (e) {
       print('Error fetching products: $e');
@@ -52,5 +59,26 @@ class ProductController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  void updateProduct(int id, String name, double price, int stock) async {
+    try {
+      isLoading(true);
+      await productRepository.updateProduct(Product(id: id, name: name, price: price, stock: stock));
+      fetchProducts();
+    } catch (e) {
+      print('Error updating product: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  void syncLocalData() async {
+    final localProducts = await localDatabase.getProducts();
+    for (var product in localProducts) {
+      await productRepository.createProduct(Product.fromJson(product));
+      await localDatabase.deleteProduct(product['id']);
+    }
+    fetchProducts();
   }
 }

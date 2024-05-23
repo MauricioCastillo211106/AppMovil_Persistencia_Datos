@@ -26,11 +26,27 @@ class ApiClient {
     final response = await http.post(
       Uri.parse('${Constants.baseUrl}/products'),
       headers: {'Content-Type': 'application/json'},
-      body: json.encode(product.toJson()),
+      body: json.encode({
+        'name': product.name,
+        'price': product.price,
+        'stock': product.stock,
+      }),
     );
 
     if (response.statusCode != 201) {
       throw Exception('Failed to create product');
+    }
+  }
+
+  Future<void> updateProduct(Product product) async {
+    final response = await http.put(
+      Uri.parse('${Constants.baseUrl}/products/${product.id}'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(product.toJson()),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update product');
     }
   }
 }
