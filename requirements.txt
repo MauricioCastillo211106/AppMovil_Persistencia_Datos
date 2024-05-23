@@ -1,7 +1,7 @@
 Flask==2.0.3
 Werkzeug==2.0.3
 Flask-SQLAlchemy==2.5.*
-psycopg2-binary==2.9.1
+psycopg2-binary==2.9.6  # o la versión más reciente compatible
 Flask-CORS==3.0.10
 SQLAlchemy==1.4.*
 python-dotenv==1.0.0
